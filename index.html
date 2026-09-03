@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Average Calculator</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .calculator-card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+        }
+        h2 {
+            margin-top: 0;
+            color: #111;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #eaeaea;
+            padding-bottom: 10px;
+        }
+        .section-title {
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: #666;
+            margin: 16px 0 8px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .input-group {
+            margin-bottom: 12px;
+        }
+        label {
+            display: block;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+            color: #444;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+        input:focus {
+            border-color: #0076ff;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            background-color: #0076ff;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #0076ff;
+        }
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        .result-row.final {
+            font-weight: bold;
+            font-size: 1.15rem;
+            color: #0076ff;
+            border-top: 1px dashed #ccc;
+            padding-top: 8px;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="calculator-card">
+    <h2>Stock Average Calculator</h2>
+    
+    <div class="section-title">Existing Position</div>
+    <div class="input-group">
+        <label for="oldShares">Current Shares</label>
+        <input type="number" id="oldShares" value="0" placeholder="e.g. 16600">
+    </div>
+    <div class="input-group">
+        <label for="oldPrice">Avg. Purchase Price (Taka)</label>
+        <input type="number" id="oldPrice" step="0.01" value="0" placeholder="e.g. 22.84">
+    </div>
+
+    <div class="section-title">New Investment</div>
+    <div class="input-group">
+        <label for="newInvestment">Additional Money to Invest (Taka)</label>
+        <input type="number" id="newInvestment" value="0" placeholder="e.g. 400000">
+    </div>
+    <div class="input-group">
+        <label for="brokerCommission">Broker Commission (%)</label>
+        <input type="number" id="brokerCommission" step="0.01" value="0.5" placeholder="e.g. 0.5">
+    </div>
+    <div class="input-group">
+        <label for="newPrice">New Share Price (Taka)</label>
+        <input type="number" id="newPrice" step="0.01" value="0" placeholder="e.g. 21.80">
+    </div>
+
+    <button onclick="calculateAverage()">Calculate New Average</button>
+
+    <div class="results" id="resultsBox">
+        <div class="result-row">
+            <span>New Shares Added:</span>
+            <span id="resNewShares">18,348.62</span>
+        </div>
+        <div class="result-row">
+            <span>Total Combined Shares:</span>
+            <span id="resTotalShares">34,948.62</span>
+        </div>
+        <div class="result-row">
+            <span>Broker Commission:</span>
+            <span id="resBrokerFee">2,000.00 Taka</span>
+        </div>
+        <div class="result-row">
+            <span>Total Invested Capital:</span>
+            <span id="resTotalCost">779,144.00 Taka</span>
+        </div>
+        <div class="result-row final">
+            <span>New Average Price:</span>
+            <span id="resAverage">22.29 Taka</span>
+        </div>
+    </div>
+</div>
+
+<script>
+function calculateAverage() {
+    const oldShares = parseFloat(document.getElementById('oldShares').value) || 0;
+    const oldPrice = parseFloat(document.getElementById('oldPrice').value) || 0;
+    const newInvestment = parseFloat(document.getElementById('newInvestment').value) || 0;
+    const newPrice = parseFloat(document.getElementById('newPrice').value) || 0;
+
+    const oldCost = oldShares * oldPrice;
+    const brokerCommission = parseFloat(document.getElementById('brokerCommission').value) || 0;
+    const effectiveInvestment = newInvestment - (newInvestment * brokerCommission / 100);
+    const newShares = newPrice > 0 ? (effectiveInvestment / newPrice) : 0;
+    
+    const totalCost = oldCost + newInvestment;
+    const brokerFee = newInvestment * brokerCommission / 100;
+    const totalShares = oldShares + newShares;
+    const newAverage = totalShares > 0 ? (totalCost / totalShares) : 0;
+
+    document.getElementById('resNewShares').innerText = newShares.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    document.getElementById('resTotalShares').innerText = totalShares.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    document.getElementById('resTotalCost').innerText = totalCost.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " Taka";
+    document.getElementById('resBrokerFee').innerText = brokerFee.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " Taka";
+    document.getElementById('resAverage').innerText = newAverage.toFixed(2) + " Taka";
+}
+</script>
+
+</body>
+</html>
