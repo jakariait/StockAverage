@@ -128,17 +128,46 @@
     <button onclick="calculateAverage()">Calculate New Average</button>
 
     <div class="results" id="resultsBox">
+        <div class="section-title">Previous Investment</div>
         <div class="result-row">
-            <span>New Shares Added:</span>
-            <span id="resNewShares">0</span>
+            <span>Old Shares:</span>
+            <span id="resOldShares">0</span>
         </div>
         <div class="result-row">
-            <span>Total Combined Shares:</span>
-            <span id="resTotalShares">0</span>
+            <span>Old Avg. Price:</span>
+            <span id="resOldPrice">0 Taka</span>
+        </div>
+        <div class="result-row">
+            <span>Old Total Cost:</span>
+            <span id="resOldCost">0 Taka</span>
+        </div>
+
+        <div class="section-title">New Investment</div>
+        <div class="result-row">
+            <span>Money Invested:</span>
+            <span id="resNewInvestment">0 Taka</span>
         </div>
         <div class="result-row">
             <span>Broker Commission:</span>
             <span id="resBrokerFee">0 Taka</span>
+        </div>
+        <div class="result-row">
+            <span>Effective Investment:</span>
+            <span id="resEffectiveInvest">0 Taka</span>
+        </div>
+        <div class="result-row">
+            <span>New Share Price:</span>
+            <span id="resNewPrice">0 Taka</span>
+        </div>
+        <div class="result-row">
+            <span>New Shares Added:</span>
+            <span id="resNewShares">0</span>
+        </div>
+
+        <div class="section-title">Combined Summary</div>
+        <div class="result-row">
+            <span>Total Combined Shares:</span>
+            <span id="resTotalShares">0</span>
         </div>
         <div class="result-row">
             <span>Total Invested Capital:</span>
@@ -152,6 +181,29 @@
 </div>
 
 <script>
+function saveInputs() {
+    const data = {
+        oldShares: document.getElementById('oldShares').value,
+        oldPrice: document.getElementById('oldPrice').value,
+        newInvestment: document.getElementById('newInvestment').value,
+        brokerCommission: document.getElementById('brokerCommission').value,
+        newPrice: document.getElementById('newPrice').value
+    };
+    localStorage.setItem('stockCalcData', JSON.stringify(data));
+}
+
+function loadInputs() {
+    const saved = localStorage.getItem('stockCalcData');
+    if (saved) {
+        const data = JSON.parse(saved);
+        document.getElementById('oldShares').value = data.oldShares || 0;
+        document.getElementById('oldPrice').value = data.oldPrice || 0;
+        document.getElementById('newInvestment').value = data.newInvestment || 0;
+        document.getElementById('brokerCommission').value = data.brokerCommission || 0.5;
+        document.getElementById('newPrice').value = data.newPrice || 0;
+    }
+}
+
 function calculateAverage() {
     const oldShares = parseFloat(document.getElementById('oldShares').value) || 0;
     const oldPrice = parseFloat(document.getElementById('oldPrice').value) || 0;
@@ -168,12 +220,24 @@ function calculateAverage() {
     const totalShares = oldShares + newShares;
     const newAverage = totalShares > 0 ? (totalCost / totalShares) : 0;
 
+    document.getElementById('resOldShares').innerText = oldShares.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    document.getElementById('resOldPrice').innerText = oldPrice.toFixed(2) + " Taka";
+    document.getElementById('resOldCost').innerText = oldCost.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " Taka";
+
+    document.getElementById('resNewInvestment').innerText = newInvestment.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " Taka";
+    document.getElementById('resBrokerFee').innerText = brokerFee.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " Taka";
+    document.getElementById('resEffectiveInvest').innerText = effectiveInvestment.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " Taka";
+    document.getElementById('resNewPrice').innerText = newPrice.toFixed(2) + " Taka";
     document.getElementById('resNewShares').innerText = newShares.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
     document.getElementById('resTotalShares').innerText = totalShares.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
     document.getElementById('resTotalCost').innerText = totalCost.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " Taka";
-    document.getElementById('resBrokerFee').innerText = brokerFee.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " Taka";
     document.getElementById('resAverage').innerText = newAverage.toFixed(2) + " Taka";
+
+    saveInputs();
 }
+
+window.onload = loadInputs;
 </script>
 
 </body>
